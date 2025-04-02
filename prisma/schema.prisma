@@ -13,24 +13,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product{
-  id       Int   @id @default(autoincrement())
-  name     String
-  sku      String @unique
-  stock    Int @default(0)
-
-  movements StockMovement[]
-  createdAt DateTime @default(now())
+// "Represents a product in the system"
+model Product {
+  id          String         @id @default(uuid())
+  name        String
+  sku         String         @unique
+  stock       Int            @default(0) // Global stock (optional, consider removing if using StoreStock)
+  movements   StockMovement[]
+  storeStock  StoreStock[]
+  createdAt   DateTime       @default(now())
 }
 
+//"Logs every change in stock (e.g., restocking, sales, or manual removal)"
 model StockMovement {
-  id       Int   @id @default(autoincrement())
-  productId Int
-  quantity  Int
-  type        String   // "STOCK_IN", "SALE", "MANUAL_REMOVAL"
+  id          Int      @id @default(autoincrement())
+  productId   String
+  quantity    Int
+  type        MovementType  // Better than String for fixed values
   notes       String?
   createdAt   DateTime @default(now())
-  product   Product  @relation(fields: [productId],references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  store       Store    @relation(fields: [storeId], references: [id])
+  storeId     String
+}
 
+//"Represents a physical or online store"
+model Store {
+  id          String        @id @default(uuid())
+  name        String
+  location    String?
+  createdAt   DateTime      @default(now())
+  stock       StoreStock[]
+  movements   StockMovement[]
+}
 
+//"Represents the quantity of a specific product in a specific store"
+model StoreStock {
+  id          String   @id @default(uuid())
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   String
+  store       Store    @relation(fields: [storeId], references: [id])
+  storeId     String
+  quantity    Int      @default(0)
+  updatedAt   DateTime @updatedAt
+  @@unique([productId, storeId])
+}
+
+//"Defines fixed types of stock movements; (e.g., restocking, sales, or manual removal)"
+enum MovementType {
+  STOCK_IN
+  SALE
+  MANUAL_REMOVAL
 }

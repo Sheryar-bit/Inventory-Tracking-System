@@ -1,6 +1,7 @@
 const express = require('express');
 const { ProductRouter } = require('./Routes/ProductRoutes');
 const { StockMovementRouter } = require('./Routes/StockMovmRoutes');
+const { storeRouter } = require('./Routes/StoreRoutes');
 require('dotenv').config()
 
 
@@ -17,6 +18,7 @@ app.get('/', function(req, res) {
 //API
 app.use('/api', ProductRouter)
 app.use('/api', StockMovementRouter)
+app.use('/api', storeRouter)
 
 
 //server Port
