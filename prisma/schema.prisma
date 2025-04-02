@@ -17,8 +17,7 @@ datasource db {
 model Product {
   id          String         @id @default(uuid())
   name        String
-  sku         String         @unique
-  stock       Int            @default(0) // Global stock (optional, consider removing if using StoreStock)
+  sku         String         @unique          
   movements   StockMovement[]
   storeStock  StoreStock[]
   createdAt   DateTime       @default(now())
@@ -26,7 +25,7 @@ model Product {
 
 //"Logs every change in stock (e.g., restocking, sales, or manual removal)"
 model StockMovement {
-  id          Int      @id @default(autoincrement())
+  id         String        @id @default(uuid())
   productId   String
   quantity    Int
   type        MovementType  // Better than String for fixed values
@@ -57,6 +56,13 @@ model StoreStock {
   quantity    Int      @default(0)
   updatedAt   DateTime @updatedAt
   @@unique([productId, storeId])
+}
+//"A user for Authenticating"
+model User {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+  createdAt DateTime @default(now())
 }
 
 //"Defines fixed types of stock movements; (e.g., restocking, sales, or manual removal)"

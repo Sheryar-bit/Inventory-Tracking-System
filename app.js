@@ -2,6 +2,7 @@ const express = require('express');
 const { ProductRouter } = require('./Routes/ProductRoutes');
 const { StockMovementRouter } = require('./Routes/StockMovmRoutes');
 const { storeRouter } = require('./Routes/StoreRoutes');
+const { Authrouter }= require('./Routes/AuthRouter');
 require('dotenv').config()
 
 
@@ -19,6 +20,8 @@ app.get('/', function(req, res) {
 app.use('/api', ProductRouter)
 app.use('/api', StockMovementRouter)
 app.use('/api', storeRouter)
+app.use('/api', Authrouter)
+
 
 
 //server Port

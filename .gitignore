@@ -17,6 +17,7 @@ build/
 
 # Ignore dependencies and package locks
 package-lock.json
+package.json
 yarn.lock
 pnpm-lock.yaml
 
