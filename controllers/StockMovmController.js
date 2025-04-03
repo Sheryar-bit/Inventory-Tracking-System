@@ -4,7 +4,7 @@ const prisma = require('../db/db_config')
 const RecordStockMovement = async (req, res) => {
     try {
       const { storeId, productId, quantity, type, notes } = req.body;
-       // 1. Validate the product exists
+       
     const product = await prisma.product.findUnique({
         where: { id: productId }
       });
@@ -13,7 +13,7 @@ const RecordStockMovement = async (req, res) => {
         return res.status(404).json({ message: "Product not found" });
       }
   
-      // 2. Validate the store exists
+      
       const store = await prisma.store.findUnique({
         where: { id: storeId }
       });
@@ -33,18 +33,18 @@ const RecordStockMovement = async (req, res) => {
         return res.status(400).json({ message: "Invalid quantity" });
       }
   
-      // 1. Record the movement
+      // Record the movement
       const stockMovement = await prisma.stockMovement.create({
         data: {
-          productId,  // UUID (String)
-          storeId,    // Critical for multi-store
+          productId,  
+          storeId,    
           quantity,
           type,
           notes
         }
       });
   
-      // 2. Update StoreStock quantity
+      
       await prisma.storeStock.upsert({
         where: {
           productId_storeId: { productId, storeId }
