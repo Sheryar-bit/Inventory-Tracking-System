@@ -1,8 +1,10 @@
-const express = require('express');
-const { ProductRouter } = require('./Routes/ProductRoutes');
-const { StockMovementRouter } = require('./Routes/StockMovmRoutes');
-const { storeRouter } = require('./Routes/StoreRoutes');
-const { Authrouter }= require('./Routes/AuthRouter');
+const  express = require('express');
+const  ProductRouter  = require('./Routes/ProductRoutes');
+const  StockMovementRouter  = require('./Routes/StockMovmRoutes');
+const  storeRouter  = require('./Routes/StoreRoutes');
+const  authRouter = require('./Routes/AuthRouter')
+const  authenticate = require('./middleware/Auth');
+const { globalLimiter, authLimiter } = require('./middleware/RateLimiter')
 require('dotenv').config()
 
 
@@ -11,16 +13,20 @@ const app = express();
 //MiddleWares
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
 //chk server
 app.get('/', function(req, res) {
     res.send('Working!')
 });
 
-//API
+//ROUTES
+app.use('/api', authLimiter, authRouter);
 app.use('/api', ProductRouter)
 app.use('/api', StockMovementRouter)
-app.use('/api', storeRouter)
-app.use('/api', Authrouter)
+app.use('/api', authenticate, storeRouter)
+
+//Global Rate Limetr for all the routes
+app.use(globalLimiter);
 
 
 
