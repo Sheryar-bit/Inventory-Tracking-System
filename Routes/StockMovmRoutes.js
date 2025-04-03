@@ -1,13 +1,10 @@
 const express = require('express');
-const {} = require('./StockMovmRoutes');
 const { RecordStockMovement, GetProductInventory } = require('../controllers/StockMovmController');
+const authenticate = require('../middleware/Auth'); 
 
-const app = express()
-const StockMovementRouter = express.Router()
+const router = express.Router(); 
 
-StockMovementRouter.post('/stock',RecordStockMovement );
-StockMovementRouter.get('/products/:productId/inventory', GetProductInventory);
+router.post('/stock', authenticate, RecordStockMovement);
+router.get('/products/:productId/inventory', GetProductInventory);
 
-module.exports={
-    StockMovementRouter
-}
+module.exports = router; 

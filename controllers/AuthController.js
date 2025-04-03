@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-const prisma = require('../db/db_config');
+const prisma = require('../db/db_config')
 require('dotenv').config()
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 const register = async function(req, res){
     try{
-    const {username, email, password} = req.body;
+    const {username, password} = req.body;
 
     if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
@@ -29,7 +29,7 @@ const register = async function(req, res){
         }
     });
     const token = jwt.sign({id: user.id}, JWT_SECRET, {expiresIn: '1h'})
-    res.status(500).json({message: "User created Succesfully! ", token, user})
+    res.status(201).json({message: "User created Succesfully! ", token, user})
     }
     
     
@@ -38,7 +38,7 @@ const register = async function(req, res){
         if (err.code === 'P2002') {
             return res.status(409).json({
                 success: false,
-                message: "Username or email already exists"
+                message: "Username already exists"
             });
         }
         return res.status(500).json({ message: "Failed to create user" });
@@ -49,9 +49,9 @@ const register = async function(req, res){
 //user login:
 const login = async function(req, res){
     try{
-        const {email, password} = req.body;
+        const {username, password} = req.body;
         const user = await prisma.user.findUnique({
-            where: {email}
+            where: {username}
         });
         
         if(!user){

@@ -3,15 +3,13 @@ const { addstore, viewstores, getsinglestore, getStoreStock } = require('../cont
 const app = express();
 
 
-const storeRouter = express.Router()
+const router = express.Router()
 
-storeRouter.post('/store', addstore);
-storeRouter.get('/stores', viewstores);
-storeRouter.get('/stores/:storeId', getsinglestore);
-storeRouter.get('/stores/:storeId/stock', getStoreStock);
+router.post('/store', addstore);
+router.get('/stores', viewstores);
+router.get('/stores/:storeId', getsinglestore);
+router.get('/stores/:storeId/stock', getStoreStock);
 
 
 
-module.exports={
-    storeRouter
-}
+module.exports=router
