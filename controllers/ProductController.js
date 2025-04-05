@@ -1,3 +1,4 @@
+const { setCache, getCache, deleteCache } = require('../middleware/Cache');
 const prisma = require('../db/db_config')
 
 //creating a product
@@ -9,7 +10,8 @@ const createProduct = async function(req, res) {
                 name,
                 sku
             }
-        })
+        });
+        await deleteCache('products:all');
         res.status(200).json({message:'Product Created', product})
     }catch(err){
         res.status(500).json({message: 'Error creating product'})
@@ -19,32 +21,46 @@ const createProduct = async function(req, res) {
 
 //Showing All the Products
 const getAllProduct = async function(req, res) {
-    try{
-        const products = await prisma.product.findMany()
-        res.json(products)
-    }catch(err){
-        res.status(500).json({message: 'Error fetching products'})
-    }
-}
+  try {
+      const key = 'products:all';
+      let products = await getCache(key); 
+
+      if (!products) {
+          products = await prisma.product.findMany();
+          await setCache(key, products, 60 * 60 * 24);
+      }
+          res.json(products);
+  } catch (err) {
+      console.error(err); 
+      res.status(500).json({ message: 'Error fetching products' });
+  }
+};
+
 
 
 //Get product details with movement history
 const getProductInventory = async (req, res) => {
     try {
       const { productId } = req.params;
+      const key = `product:inventory:${productId}`;
       
-      const product = await prisma.product.findUnique({
+      let product = await getCache(key);
+      if (!product) {
+        product = await prisma.product.findUnique({
         where: { id: productId },
         include: {
           movements: {
             orderBy: { createdAt: 'desc' } // Newest first
           }
         }
+      
       });
   
       if (!product) {
         return res.status(404).json({ message: "Product not found" });
       }
+      await setCache(key, product, 60 * 60 * 24);
+    }
   
       const currentQuantity = product.movements.reduce((total, movement) => {
         return movement.type === "STOCK_IN" 
@@ -66,6 +82,7 @@ const getProductInventory = async (req, res) => {
       res.status(500).json({ message: "Error fetching inventory" });
     }
   };
+  
 
 
 //Updating the product
@@ -79,7 +96,11 @@ const UpdateProduct = async function (req, res) {
             where: {
                 id: product_id
             }
-        })
+        });
+
+        await deleteCache('products:all');
+        await deleteCache(`product:inventory:${product_id}`);
+
         res.status(200).json({message:'Product Updated', updateProduct})
 
     }catch(err){
@@ -98,7 +119,9 @@ const deleteProduct = async function(req, res){
         where: {
             id: (product_id)
         }
- })
+  });
+        await deleteCache('products:all');
+        await deleteCache(`product:inventory:${product_id}`);
         res.status(200).json({message:'Product Deleted', deleteProduct})
       }
       catch(err){
