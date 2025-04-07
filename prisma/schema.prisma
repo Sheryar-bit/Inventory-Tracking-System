@@ -64,6 +64,15 @@ model User {
   password String
   createdAt DateTime @default(now())
 }
+//Chks Audits
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String
+  userId    String
+  meta      Json?
+  createdAt DateTime @default(now())
+}
+
 
 //"Defines fixed types of stock movements; (e.g., restocking, sales, or manual removal)"
 enum MovementType {
