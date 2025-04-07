@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-const prisma = require('../db/db_config')
+const prisma = require('../db/db_config');
+const logAction = require('../middleware/AuditLogger');
 require('dotenv').config()
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -29,6 +30,11 @@ const register = async function(req, res){
         }
     });
     const token = jwt.sign({id: user.id}, JWT_SECRET, {expiresIn: '1h'})
+
+    await logAction('USER_REGISTRATION', user.id, {
+        username,
+        timestamp: new Date().toISOString(),
+    });
     res.status(201).json({message: "User created Succesfully! ", token, user})
     }
     
@@ -64,6 +70,13 @@ const login = async function(req, res){
         }
 
         const token = jwt.sign({id: user.id}, JWT_SECRET, {expiresIn: '1h'})
+
+        await logAction('USER_LOGIN_SUCCESS', user.id, {
+            username,
+            timestamp: new Date().toISOString(),
+            ip: req.ip, //will cpture the IP address
+        });
+
         res.status(200).json({message: "Login Succesfull! ", token, user})
 
 

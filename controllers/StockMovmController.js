@@ -1,4 +1,5 @@
 const prisma = require('../db/db_config');
+const logAction = require('../middleware/AuditLogger');
 const { getCache, setCache, deleteCache } = require('../middleware/Cache');
 
 // Creating stok movement
@@ -60,6 +61,14 @@ const RecordStockMovement = async (req, res) => {
 
         const productCacheKey = `product:${productId}`;
         await deleteCache(productCacheKey);
+
+        await logAction('STOCK_MOVEMENT', req.user?.id || 'system', {
+            productId,
+            storeId,
+            quantity,
+            type,
+            notes,
+        });
 
         return res.status(201).json({
             message: "Stock Movement Recorded!",
