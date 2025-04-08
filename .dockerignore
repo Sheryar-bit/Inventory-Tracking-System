@@ -1,2 +1,25 @@
+# Node.js
 node_modules
 npm-debug.log
+
+# Environment files
+.env
+.env.*
+
+# Version control
+.git
+.gitignore
+
+# System files
+.DS_Store
+
+# Build artifacts
+dist
+coverage
+
+# Documentation
+*.md
+
+# IDE specific files
+.vscode
+.idea

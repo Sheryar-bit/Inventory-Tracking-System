@@ -29,4 +29,7 @@ Thumbs.db
 *.swp
 *.swo
 
+# Docker
+docker-compose.yml
+
 
