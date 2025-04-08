@@ -1,19 +1,30 @@
-FROM node:18
 
-WORKDIR /usr/src/app
+FROM node:18-alpine
 
 
-COPY package*.json ./
-COPY prisma/schema.prisma ./prisma/schema.prisma
+WORKDIR /app
 
-RUN npm install
+
+COPY package.json ./
+
+
+RUN npm install --production
+
+
+COPY controllers ./controllers
+COPY db ./db
+COPY middleware ./middleware
+COPY Routes ./Routes
+COPY prisma ./prisma
+COPY app.js .
+COPY README.md .
+
+
 
 RUN npx prisma generate
 
-COPY . .
 
-RUN ls -la node_modules/.prisma/client
+EXPOSE 3000
 
-RUN npx prisma generate
 
 CMD ["node", "app.js"]
