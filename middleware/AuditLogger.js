@@ -1,6 +1,6 @@
 const prisma  = require('../db/db_config');
 
-async function logAction(action, userId, meta = {}) {
+async function logAudit(action, userId, meta = {}) {
   await prisma.auditLog.create({
     data: {
       action,
@@ -10,4 +10,4 @@ async function logAction(action, userId, meta = {}) {
   });
 }
 
-module.exports = logAction;
+module.exports = logAudit;

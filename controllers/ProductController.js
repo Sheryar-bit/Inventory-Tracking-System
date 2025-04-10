@@ -1,5 +1,5 @@
 const { setCache, getCache, deleteCache } = require('../middleware/Cache');
-const logAction = require('../middleware/AuditLogger');
+const logAudit = require('../middleware/AuditLogger');
 const prisma = require('../db/db_config')
 
 //creating a product
@@ -12,7 +12,12 @@ const createProduct = async function(req, res) {
                 sku
             }
         });
-        await logAction('CREATE_PRODUCT', req.user?.id || 'system', { productId: product.id, name, sku });
+        await logAction('CREATE_PRODUCT', req.user?.id || 'system', { 
+          productId: newProduct.id, 
+          name, 
+          sku 
+      });
+        await logAudit('CREATE_PRODUCT', req.user?.id || 'system', { productId: product.id, name, sku });
         await deleteCache('products:all');
         
         res.status(200).json({message:'Product Created', product})
@@ -101,7 +106,7 @@ const UpdateProduct = async function (req, res) {
             }
         });
 
-        await logAction('UPDATE_PRODUCT', req.user?.id || 'system', { productId: product_id, name, sku });
+        await logAudit('UPDATE_PRODUCT', req.user?.id || 'system', { productId: product_id, name, sku });
         await deleteCache('products:all');
         await deleteCache(`product:inventory:${product_id}`);
 
@@ -124,7 +129,7 @@ const deleteProduct = async function(req, res){
             id: (product_id)
         }
   });
-        await logAction('DELETE_PRODUCT', req.user?.id || 'system', { productId: product_id });
+        await logAudit('DELETE_PRODUCT', req.user?.id || 'system', { productId: product_id });
         await deleteCache('products:all');
         await deleteCache(`product:inventory:${product_id}`);
         

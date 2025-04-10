@@ -1,5 +1,5 @@
 const prisma = require('../db/db_config');
-const logAction = require('../middleware/AuditLogger');
+const logAudit = require('../middleware/AuditLogger');
 const { getCache, setCache, deleteCache } = require('../middleware/Cache'); 
 
 // Create a store
@@ -11,7 +11,7 @@ const addstore = async (req, res) => {
       data: { name, location }
     });
 
-    await logAction('STORE_CREATION', store.id, {
+    await logAudit('STORE_CREATION', store.id, {
       name,
       location,
       timestamp: new Date().toISOString(),
@@ -117,9 +117,15 @@ const updatestore = async (req, res) => {
       data: { name, location }
     });
 
-    await logAction('STORE_UPDATE', storeId, {
-      oldData: { name: store.name, location: store.location },
-      newData: { name, location },
+    await logAudit('STORE_UPDATE', storeId, {
+      oldData: { 
+        name: store.name, 
+        location: store.location 
+      },
+      newData: { 
+        name, 
+        location 
+      },
       timestamp: new Date().toISOString(),
       updatedBy: req.user ? req.user.id : null
     });
@@ -142,7 +148,7 @@ const deletestore = async (req, res) => {
       where: { id: storeId }
     });
 
-    await logAction('STORE_DELETION', storeId, {
+    await logAudit('STORE_DELETION', storeId, {
       storeName: store.name,
       timestamp: new Date().toISOString(),
       deletedBy: req.user ? req.user.id : null
