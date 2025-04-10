@@ -1,5 +1,6 @@
 const prisma = require('../db/db_config');
-const logAction = require('../middleware/AuditLogger');
+const logAction = require('../middleware/AuditQueue');
+const logAudit = require('../middleware/AuditLogger')
 const { getCache, setCache, deleteCache } = require('../middleware/Cache');
 
 // Creating stok movement
@@ -62,13 +63,36 @@ const RecordStockMovement = async (req, res) => {
         const productCacheKey = `product:${productId}`;
         await deleteCache(productCacheKey);
 
-        await logAction('STOCK_MOVEMENT', req.user?.id || 'system', {
+        await logAction('STOCK_MOVEMENT', userId, {
+            productId,
+            storeId,
+            quantity,
+            type,
+            notes,
+            movementId: result.id
+        });
+
+
+        await logAudit('STOCK_MOVEMENT', req.user?.id || 'system', {
             productId,
             storeId,
             quantity,
             type,
             notes,
         });
+
+        const currentStock = await prisma.storeStock.findUnique({
+            where: { productId_storeId: { productId, storeId } }
+        });
+
+        if (currentStock.quantity < LOW_STOCK_THRESHOLD) {
+            await logAction('LOW_STOCK_ALERT', 'system', {
+                productId,
+                storeId,
+                currentStock: currentStock.quantity,
+                threshold: LOW_STOCK_THRESHOLD
+            });
+        }
 
         return res.status(201).json({
             message: "Stock Movement Recorded!",
