@@ -1,12 +1,15 @@
 const prisma = require('../db/db_config');
-const logAction = require('../middleware/AuditQueue');
+const { logAction } = require('../middleware/AuditQueue');
 const logAudit = require('../middleware/AuditLogger')
 const { getCache, setCache, deleteCache } = require('../middleware/Cache');
+
+const LOW_STOCK_THRESHOLD=10
 
 // Creating stok movement
 const RecordStockMovement = async (req, res) => {
     try {
         const { storeId, productId, quantity, type, notes } = req.body;
+        const userId = req.user?.id || 'system';
 
         const product = await prisma.product.findUnique({
             where: { id: productId },
@@ -41,6 +44,7 @@ const RecordStockMovement = async (req, res) => {
                 quantity,
                 type,
                 notes,
+                userId
             },
         });
 
@@ -63,23 +67,24 @@ const RecordStockMovement = async (req, res) => {
         const productCacheKey = `product:${productId}`;
         await deleteCache(productCacheKey);
 
-        await logAction('STOCK_MOVEMENT', userId, {
+        await logAction('STOCK_MOVEMENT',userId, {
             productId,
             storeId,
             quantity,
             type,
             notes,
-            movementId: result.id
+            movementId: stockMovement.id
+            
         });
 
 
-        await logAudit('STOCK_MOVEMENT', req.user?.id || 'system', {
-            productId,
-            storeId,
-            quantity,
-            type,
-            notes,
-        });
+        // await logAudit('STOCK_MOVEMENT', req.user?.id || 'system', {
+        //     productId,
+        //     storeId,
+        //     quantity,
+        //     type,
+        //     notes,
+        // });
 
         const currentStock = await prisma.storeStock.findUnique({
             where: { productId_storeId: { productId, storeId } }
