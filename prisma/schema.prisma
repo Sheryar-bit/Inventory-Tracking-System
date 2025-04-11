@@ -30,6 +30,7 @@ model StockMovement {
   quantity    Int
   type        MovementType  // Better than String for fixed values
   notes       String?
+  userId    String?  @default("system")
   createdAt   DateTime @default(now())
   product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   store       Store    @relation(fields: [storeId], references: [id])
