@@ -1,7 +1,10 @@
 const redis = require('redis')
+require('dotenv').config();
 
-const redisClient = redis.createClient();
-
+const redisClient = redis.createClient({
+    host: process.env.REDIS_HOST || 'redis',
+    port: process.env.REDIS_PORT || 6379
+});
 // Redis Connection
 (
     async function() {
@@ -17,8 +20,7 @@ const redisClient = redis.createClient();
         await redisClient.connect();
         await redisClient.ping();
     }
-)()
-
+)();
 //Setting data into cache:
 const setCache = async function (key, data, expiry = 300) {
     const value = typeof data === 'string' ? data : JSON.stringify(data);
@@ -36,8 +38,6 @@ const getCache = async function (key) {
         return value
     }
 }
-
-
 const deleteCache = async function (key) {
     await redisClient.del(key);
 }
