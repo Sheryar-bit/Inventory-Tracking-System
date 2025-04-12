@@ -1,5 +1,5 @@
 # **Inventory Tracking System**  
-*A scalable backend service for tracking inventory across retail stores, built for Bazaar Technologies' Engineering Internship Challenge. Starting from a single kiryana store and evolving into a multi-store, multi-supplier platform with built-in audit capabilities. This system must be designed for high performance, scalability, and reliability to support high-volume retail operations.*  
+*A scalable backend service for tracking inventory across retail stores, built for Bazaar Technologies' Engineering Challenge following the given Case Study. Starting from a single kiryana store and evolving into a multi-store, multi-supplier platform with built-in audit capabilities. This system is designed for high performance, scalability, and reliability to support high-volume retail operations.*  
 
 ---
 
