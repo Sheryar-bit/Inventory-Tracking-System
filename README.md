@@ -75,7 +75,7 @@ RESTful conventions with JSON responses.
 
 ### **Stock Movements**  
 | Endpoint                        | Method | Description                          | Auth Required |  
-|------------------------         |--------|--------------------------------------|---------------|  
+|---------------------------------|--------|--------------------------------------|---------------|  
 | `/stock`                        | POST   | Record stock movement (in/out/sale)  | Yes           |  
 | `/products/:productId/inventory`| GET    | Get stock movement (in/out/sale)     | No            |  
 
